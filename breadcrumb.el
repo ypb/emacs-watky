@@ -4,7 +4,7 @@
 ;;
 ;; Author: William W. Wong <williamw520(AT)yahoo(DOT)com>
 ;; Created: October, 2004
-;; Version: 1.1.4
+;; Version: 1.9.0
 ;; Keywords: breadcrumb, quick, bookmark, bookmarks
 
 ;; This file is not part of GNU Emacs.
