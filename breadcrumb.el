@@ -193,7 +193,7 @@
   :type 'integer
   :group 'breadcrumb)
 
-(defcustom bc-bookmark-file (expand-file-name "~/.breadcrumb")
+(defcustom bc-bookmark-file (expand-file-name "~/.emacs.bc0")
   "*Filename to store bookmarks across Emacs sessions.  If nil the bookmarks will not be saved."
   :type 'string
   :group 'breadcrumb)
