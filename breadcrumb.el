@@ -276,7 +276,7 @@
   )
 
 (defun bc-list ()
-  "Display the breadcrumb bookmarks in the buffer `*Breadcrumb Bookmarks*' to allow interactive management of them."
+  "Display the breadcrumb bookmarks in the buffer `*breadcrumbs*' to allow interactive management of them."
   (interactive)
   (switch-to-buffer (get-buffer-create bc--menu-buffer))
   (bc-menu-redraw)
@@ -315,7 +315,8 @@ The list is (Bookmark1 Bookmark2 ...) where each Bookmark is (TYPE FILENAME . PO
 (defconst bc--type-system       'system)
 
 ;;; Constants
-(defconst bc--menu-buffer       "*Breadcrumb Bookmarks*")
+;;(defconst bc--menu-buffer       "*Breadcrumb Bookmarks*")
+(defconst bc--menu-buffer       "*breadcrumbs*")
 (defconst bc--file-magic        "WBC")
 (defconst bc--file-version      1)
 
@@ -532,20 +533,20 @@ It's the position (point) for normal buffer and (info-node-name point) for Info 
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; *Breadcrumb Bookmark* menu functions
+;; *breadcrumbs* menu functions
 
-(defconst bc--menu-table-offset 7)
+(defconst bc--menu-table-offset 4)
 
 (defun bc-menu-redraw ()
-  "Redraw the breadcrumb bookmarks in the buffer named `*Breadcrumb Bookmarks*'."
+  "Redraw the breadcrumb bookmarks in the buffer named `*breadcrumbs*'."
   (save-excursion
     (save-window-excursion
       (let ((index 0))
         (setq inhibit-read-only t)
         (erase-buffer)
-        (insert "*Breadcrumb Bookmarks*\n\n")
-        (insert "Bookmarks listed in most recently set order.  Press '?' for help.\n")
-        (insert "The bookmark preceded by a \">\" is the last jump-to bookmark.\n\n")
+        (insert bc--menu-buffer)
+        (insert "   Most recent first.  Press '?' for help.\n")
+        (insert "\">\" is the last jumped-to bookmark.\n")
         (insert "% Type    Position      Buffer\n")
         (insert "- ------- ------------  ---------------------------------\n")
         (mapc
@@ -707,14 +708,14 @@ The following commands are available.
 \\[bc-menu-commit-deletions] -- delete bookmarks marked with `\\[bc-menu-mark-delete]'.
 \\[next-line] -- move to the next line
 \\[previous-line] -- move to the previous line
-\\[generic-close-buffer] -- close the *Breadcrumb Bookmarks* window
+\\[generic-close-buffer] -- close the *breadcrumbs* window
 "
   (kill-all-local-variables)
   (use-local-map *bc-menu-mode-map*)
   (setq truncate-lines t)
   (setq buffer-read-only t)
   (setq major-mode 'bc-menu-mode)
-  (setq mode-name "Breadcrumb Bookmark Menu")
+  (setq mode-name "bc-menu-mode")
   )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
