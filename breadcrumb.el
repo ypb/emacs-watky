@@ -588,7 +588,7 @@ It's the position (point) for normal buffer and (info-node-name point) for Info 
   (interactive)
   (when (bc-menu-valid-bookmark)
     (let ((bookmark-index (bc-menu-get-bookmark-index)))
-      (generic-close-buffer)
+      (tm-menu-generic-close-buffer)
       (bc-jump-to bookmark-index)
       ))
   )
@@ -680,7 +680,7 @@ It's the position (point) for normal buffer and (info-node-name point) for Info 
 (progn
   (setq *bc-menu-mode-map* (make-keymap))
   (suppress-keymap *bc-menu-mode-map* t)
-  (define-key *bc-menu-mode-map* "q"        'generic-close-buffer)
+  (define-key *bc-menu-mode-map* "q"        'tm-menu-generic-close-buffer)
   (define-key *bc-menu-mode-map* "j"        'bc-menu-jump)
   (define-key *bc-menu-mode-map* "\C-m"     'bc-menu-jump)
   (define-key *bc-menu-mode-map* "v"        'bc-menu-visit-other)
@@ -708,7 +708,7 @@ The following commands are available.
 \\[bc-menu-commit-deletions] -- delete bookmarks marked with `\\[bc-menu-mark-delete]'.
 \\[next-line] -- move to the next line
 \\[previous-line] -- move to the previous line
-\\[generic-close-buffer] -- close the *breadcrumbs* window
+\\[tm-menu-generic-close-buffer] -- close the *breadcrumbs* window
 "
   (kill-all-local-variables)
   (use-local-map *bc-menu-mode-map*)
@@ -817,13 +817,12 @@ If POS is nil, use current buffer location."
         (forward-line 0)
         (1+ (count-lines start (point)))))))
 
-(defun generic-close-buffer ()
+(defun tm-menu-generic-close-buffer ()
   "Make closing buffer work for both Emacs and XEmacs"
   (interactive)
   (if (fboundp 'quit-window)
       (quit-window)
-    (bury-buffer))
-)
+    (bury-buffer)))
 
 (provide 'breadcrumb)
 
