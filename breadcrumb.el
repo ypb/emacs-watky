@@ -165,20 +165,13 @@
 ;;      Version 1.0 release
 ;;
 
-;;;
-;;  Todo:
+;;; Todo:
 ;;
-;;
-
 
 
 ;;; Code:
-;;;
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Public section
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;; User Configuration Variables
 
@@ -203,7 +196,6 @@
   :type 'boolean
   :group 'breadcrumb)
 
-
 ;;; User callable functions
 
 (defun bc-set ()
@@ -220,9 +212,7 @@
           (bc-bookmarks-add (bc-bookmark-new type filename position))
           (setq *bc-current* 0)
           (setq *bc-bookmark-just-added* t)
-          (message "breadcrumb bookmark is set for the current position.")
-          ))))
-  )
+          (message "breadcrumb bookmark is set for the current position."))))))
 
 (defun bc-previous ()
   "Jump to the previous bookmark."
@@ -230,8 +220,7 @@
   (if *bc-bookmark-just-added*
       (setq *bc-bookmark-just-added* nil)
     (bc-advance-current 'bc-bookmarks-increment))
-  (bc-jump (bc-bookmarks-get *bc-current*))
-  )
+  (bc-jump (bc-bookmarks-get *bc-current*)))
 
 (defun bc-next ()
   "Jump to the next bookmark."
@@ -239,8 +228,7 @@
   (if *bc-bookmark-just-added*
       (setq *bc-bookmark-just-added* nil)
     (bc-advance-current 'bc-bookmarks-decrement))
-  (bc-jump (bc-bookmarks-get *bc-current*))
-  )
+  (bc-jump (bc-bookmarks-get *bc-current*)))
 
 (defun bc-local-previous ()
   "Jump to the previous bookmark in the local buffer."
@@ -249,8 +237,7 @@
       (setq *bc-bookmark-just-added* nil))
   (if (bc-local-advance-current 'bc-bookmarks-increment)
       (bc-jump (bc-bookmarks-get *bc-current*))
-    (message "No breadcrumb bookmark set in local buffer."))
-  )
+    (message "No breadcrumb bookmark set in local buffer.")))
 
 (defun bc-local-next ()
   "Jump to the next bookmark in the local buffer."
@@ -259,21 +246,18 @@
       (setq *bc-bookmark-just-added* nil))
   (if (bc-local-advance-current 'bc-bookmarks-decrement)
       (bc-jump (bc-bookmarks-get *bc-current*))
-    (message "No breadcrumb bookmark set in local buffer."))
-  )
+    (message "No breadcrumb bookmark set in local buffer.")))
 
 (defun bc-goto-current ()
   "Jump to the current bookmark."
   (interactive)
-  (bc-jump-to *bc-current*)
-  )
+  (bc-jump-to *bc-current*))
 
 (defun bc-clear ()
   "Clear all the breadcrumb bookmarks in the queue."
   (interactive)
   (setq *bc-bookmarks* ())
-  (setq *bc-current* 0)
-  )
+  (setq *bc-current* 0))
 
 (defun bc-list ()
   "Display the breadcrumb bookmarks in the buffer `*breadcrumbs*' to allow interactive management of them."
@@ -282,29 +266,21 @@
   (bc-menu-redraw)
   (goto-char (point-min))
   (forward-line bc--menu-table-offset)
-  (bc-menu-mode)
-  )
+  (bc-menu-mode))
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Private section
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 
 ;;; Program global variables:
 
 (defvar *bc-bookmarks* ()
   "List of bookmarks and their records.
-The list is (Bookmark1 Bookmark2 ...) where each Bookmark is (TYPE FILENAME . POSITION)"
-  )
+The list is (Bookmark1 Bookmark2 ...) where each Bookmark is (TYPE FILENAME . POSITION)")
 
 (defvar *bc-current* 0
-  "The current bookmark.  `bc-next' and `bc-previous' would use this as the starting point."
-  )
+  "The current bookmark.  `bc-next' and `bc-previous' would use this as the starting point.")
 
 (defvar *bc-bookmark-just-added* nil
-  "Flag indicates a bookmark has just been added.  `bc-next' and `bc-previous' use this to determine whether to increment or decrement."
-  )
+  "Flag indicates a bookmark has just been added.  `bc-next' and `bc-previous' use this to determine whether to increment or decrement.")
 
 ;;; Buffer type constants
 
@@ -320,8 +296,6 @@ The list is (Bookmark1 Bookmark2 ...) where each Bookmark is (TYPE FILENAME . PO
 (defconst bc--file-magic        "WBC")
 (defconst bc--file-version      1)
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Bookmark record functions
 
 (defun bc-bookmark-new (type filename position)
@@ -332,31 +306,26 @@ POSITION the positio of the breadcrumb bookmark."
   (cons type (cons filename position)))
 
 (defun bc-bookmark-type (bookmark)
-  (car bookmark)
-  )
+  (car bookmark))
 
 (defun bc-bookmark-filename (bookmark)
-  (car (cdr bookmark))
-  )
+  (car (cdr bookmark)))
 
 (defun bc-bookmark-position (bookmark)
-  (cdr (cdr bookmark))
-  )
+  (cdr (cdr bookmark)))
 
 (defun bc-bookmarks-add (bookmark)
   "Add a bookmark record."
   ;; Remove existing duplicate bookmark.
   (setq *bc-bookmarks* (remove bookmark *bc-bookmarks*))
   (bc-bookmarks-make-room)
-  (setq *bc-bookmarks* (cons bookmark *bc-bookmarks*))
-  )
+  (setq *bc-bookmarks* (cons bookmark *bc-bookmarks*)))
 
 (defun bc-bookmarks-make-room ()
   "Make sure the bookmark list not exceeding limit.  Remove the last item if exceeded."
   (if (>= (length *bc-bookmarks*) bc-bookmark-limit)
       ;; Remove last item from list
-      (setq *bc-bookmarks* (reverse (cdr (reverse *bc-bookmarks*))))
-    ))
+      (setq *bc-bookmarks* (reverse (cdr (reverse *bc-bookmarks*))))))
 
 (defun bc-bookmarks-get (index)
   "Get a bookmark record from the list based on its index.
@@ -369,10 +338,8 @@ INDEX the bookmark index (0-based) into the bookmark queue."
         (setq bookmark (car list1))
         (setq list1 (cdr list1))
         (setq index (1- index)))
-      bookmark))
-  )
+      bookmark)))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Bookmark current position functions
 
 (defun bc-bookmarks-increment (index)
@@ -380,8 +347,7 @@ INDEX the bookmark index (0-based) into the bookmark queue."
   (setq index (1+ index))
   (if (< index (length *bc-bookmarks*))
       index
-    0)
-  )
+    0))
 
 (defun bc-bookmarks-decrement (index)
   "Return the decrement of the input index.  Wrap around when reaching beginning of *bc-bookmarks*."
@@ -390,21 +356,18 @@ INDEX the bookmark index (0-based) into the bookmark queue."
       index
     (if (= (length *bc-bookmarks*) 0)
         0
-      (1- (length *bc-bookmarks*))))
-  )
+      (1- (length *bc-bookmarks*)))))
 
 (defun bc-advance-current (incremental-func)
   "Increment or decrement the current index '*bc-current*' based on the 'incremental-func' parameter."
-  (setq *bc-current* (funcall incremental-func *bc-current*))
-  )
+  (setq *bc-current* (funcall incremental-func *bc-current*)))
 
 (defun bc-local-advance-current (incremental-func)
   "Increment the current index '*bc-current*'."
   (let ((buffer-type (bc-get-buffer-type))
         (buffer-filename (bc-get-buffer-filename (bc-get-buffer-type)))
         (buffer-bookmark-index)
-        (next-index nil)
-        )
+        (next-index nil))
     (setq buffer-bookmark-index (bc-bookmarks-find-by buffer-type buffer-filename))
     (if (null buffer-bookmark-index)
         ;; Current buffer has no bookmark.  Don't do any jumping.
@@ -413,11 +376,7 @@ INDEX the bookmark index (0-based) into the bookmark queue."
                         incremental-func *bc-current* buffer-type buffer-filename))
       (if (= next-index -1)
           nil
-        (setq *bc-current* next-index)
-        )
-      )
-    )
-  )
+        (setq *bc-current* next-index)))))
 
 (defun bc-bookmarks-find-by (type filename)
   "Find any bookmark matching type and filename.  Return the first matching one.  Return nil if not found."
@@ -429,13 +388,9 @@ INDEX the bookmark index (0-based) into the bookmark queue."
                 (equal type (bc-bookmark-type bookmark))
                 (equal filename (bc-bookmark-filename bookmark)))
            (setq bookmark-index index))
-       (setq index (1+ index))
-       )
-     *bc-bookmarks*
-     )
-    bookmark-index
-    )
-  )
+       (setq index (1+ index)))
+     *bc-bookmarks*)
+    bookmark-index))
 
 (defun bc-bookmarks-circular-find-by (incremental-func starting-index type filename)
   "Find the next bookmark matching type and filename after the starting-index.
@@ -447,27 +402,19 @@ Return the first matching index.  Return -1 if not found."
         (setq bookmark (bc-bookmarks-get index))
         (if (and (equal type (bc-bookmark-type bookmark))
                  (equal filename (bc-bookmark-filename bookmark)))
-            (throw 'done index)
-            )
+            (throw 'done index))
         (if (= index starting-index)
             ;; Wrap around to starting-index again.  Exit.  Not found.
-            (throw 'done -1)
-            )
-        (setq index (funcall incremental-func index))
-        )
-      )
-    )
-  )
+            (throw 'done -1))
+        (setq index (funcall incremental-func index))))))
 
 (defun bc-jump-to (bookmark-index &optional switch-buffer-func)
   "Jump to a bookmark based on the bookmark-index."
   (let ((bookmark (bc-bookmarks-get bookmark-index)))
-    (when (not(null bookmark))
+    (when (not (null bookmark))
       (setq *bc-bookmark-just-added* nil)
       (setq *bc-current* bookmark-index)
-      (bc-jump bookmark switch-buffer-func)
-      ))
-  )
+      (bc-jump bookmark switch-buffer-func))))
 
 (defun bc-jump (bookmark &optional switch-buffer-func)
   "Jump to a bookmark.
@@ -493,12 +440,8 @@ BOOKMARK is the bookmark to jump to, which has the form (FILENAME . POSITION)."
         (goto-char position))
        ((eq type bc--type-unsupported)
         (error "Unsupported bookmark type"))
-       (t (error "Unknown bookmark type")))
-      )
-    )
-  )
+       (t (error "Unknown bookmark type"))))))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Get bookmark information from the current buffer
 
 (defun bc-get-buffer-type ()
@@ -531,8 +474,6 @@ It's the position (point) for normal buffer and (info-node-name point) for Info 
     ((eq type bc--type-system)  (point))
     (t nil)))
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; *breadcrumbs* menu functions
 
 (defconst bc--menu-table-offset 4)
@@ -556,11 +497,8 @@ It's the position (point) for normal buffer and (info-node-name point) for Info 
                            (symbol-name (bc-bookmark-type bookmark))
                            (bc-bookmark-position-to-str bookmark) 
                            (bc-bookmark-filename bookmark)))
-           (setq index (1+ index))
-           )
-         *bc-bookmarks*)
-        )))
-  )
+           (setq index (1+ index)))
+         *bc-bookmarks*)))))
 
 (defun bc-bookmark-position-to-str (bookmark)
   (let ((type (bc-bookmark-type bookmark))
@@ -570,18 +508,15 @@ It's the position (point) for normal buffer and (info-node-name point) for Info 
       ((eq type bc--type-file)   (number-to-string position))
       ((eq type bc--type-dired)  (number-to-string position))
       ((eq type bc--type-system) (number-to-string position))
-      (t (number-to-string position))))
-  )
+      (t (number-to-string position)))))
 
 (defun bc-menu-get-bookmark-index ()
   "Return a bookmark index under the cursor.  Index might be out of range."
-  (1- (- (line-number-at-pos) bc--menu-table-offset))
-  )
+  (1- (- (line-number-at-pos) bc--menu-table-offset)))
 
 (defun bc-menu-valid-bookmark ()
   "Check whether the cursor is on a valid bookmark"
-  (not (null (bc-bookmarks-get (bc-menu-get-bookmark-index))))
-  )
+  (not (null (bc-bookmarks-get (bc-menu-get-bookmark-index)))))
 
 (defun bc-menu-jump ()
   "Jump to the bookmark under cursor."
@@ -589,16 +524,13 @@ It's the position (point) for normal buffer and (info-node-name point) for Info 
   (when (bc-menu-valid-bookmark)
     (let ((bookmark-index (bc-menu-get-bookmark-index)))
       (tm-menu-generic-close-buffer)
-      (bc-jump-to bookmark-index)
-      ))
-  )
+      (bc-jump-to bookmark-index))))
 
 (defun bc-menu-advance-cursor ()
   (forward-line 1)
   (when (null (bc-menu-valid-bookmark))
     (goto-char (point-min))
-    (forward-line bc--menu-table-offset))
-  )
+    (forward-line bc--menu-table-offset)))
 
 (defun bc-menu-visit-other ()
   "Visit the bookmark under cursor in the other window."
@@ -608,9 +540,7 @@ It's the position (point) for normal buffer and (info-node-name point) for Info 
     (bc-jump-to (bc-menu-get-bookmark-index) 'switch-to-buffer-other-window)
     ;; Switch back to the Breadcrumb Bookmark Menu's buffer
     (switch-to-buffer-other-window (get-buffer bc--menu-buffer))
-    (bc-menu-advance-cursor)
-    )
-  )
+    (bc-menu-advance-cursor)))
 
 (defun bc-menu-mark-char (mark-char)
   "Set a mark char on the bookmark line at cursor."
@@ -619,8 +549,7 @@ It's the position (point) for normal buffer and (info-node-name point) for Info 
     (beginning-of-line)
     (delete-char 1)
     (insert mark-char)
-    (bc-menu-advance-cursor)
-  ))
+    (bc-menu-advance-cursor)))
 
 (defun bc-menu-mark-all-char (mark-char)
   "Set a mark char for all of the bookmark lines."
@@ -629,33 +558,27 @@ It's the position (point) for normal buffer and (info-node-name point) for Info 
     (goto-char (point-min))
     (forward-line bc--menu-table-offset)
     (dotimes (i (length *bc-bookmarks*))
-      (bc-menu-mark-char mark-char)
-      ))
-  )
+      (bc-menu-mark-char mark-char))))
 
 (defun bc-menu-mark-delete ()
   "Mark the bookmark at cursor for delete."
   (interactive)
-  (bc-menu-mark-char "D")
-  )
+  (bc-menu-mark-char "D"))
 
 (defun bc-menu-unmark-delete ()
   "Unmark the bookmark at cursor from deletion."
   (interactive)
-  (bc-menu-mark-char " ")
-  )
+  (bc-menu-mark-char " "))
 
 (defun bc-menu-mark-all-delete ()
   "Mark all of the bookmarks for delete."
   (interactive)
-  (bc-menu-mark-all-char "D")
-  )
+  (bc-menu-mark-all-char "D"))
 
 (defun bc-menu-unmark-all-delete ()
   "Unmark all of the bookmarks from delete."
   (interactive)
-  (bc-menu-mark-all-char " ")
-  )
+  (bc-menu-mark-all-char " "))
 
 (defun bc-menu-commit-deletions ()
   "Commit deletion on the marked bookmarks."
@@ -670,11 +593,9 @@ It's the position (point) for normal buffer and (info-node-name point) for Info 
       (forward-line 1))
     (dolist (index items-to-delete)
       (let ((bookmark (bc-bookmarks-get index)))
-        (setq *bc-bookmarks* (remove bookmark *bc-bookmarks*))))
-    )
+        (setq *bc-bookmarks* (remove bookmark *bc-bookmarks*)))))
   (bc-menu-redraw)
-  (forward-line bc--menu-table-offset)
-  )
+  (forward-line bc--menu-table-offset))
 
 (defvar *bc-menu-mode-map* nil)
 (progn
@@ -692,8 +613,7 @@ It's the position (point) for normal buffer and (info-node-name point) for Info 
   (define-key *bc-menu-mode-map* "n"        'next-line)
   (define-key *bc-menu-mode-map* " "        'next-line)
   (define-key *bc-menu-mode-map* "p"        'previous-line)
-  (define-key *bc-menu-mode-map* "?"        'describe-mode)
-  )
+  (define-key *bc-menu-mode-map* "?"        'describe-mode))
 
 (defun bc-menu-mode ()
   "Major mode for listing and editing the list of breadcrumb bookmarks.
@@ -715,10 +635,8 @@ The following commands are available.
   (setq truncate-lines t)
   (setq buffer-read-only t)
   (setq major-mode 'bc-menu-mode)
-  (setq mode-name "bc-menu-mode")
-  )
+  (setq mode-name "bc-menu-mode"))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Bookmark saving and restoring
 
 (defun bc-bookmarks-save ()
@@ -730,10 +648,8 @@ The following commands are available.
           (cons 'timestamp (current-time))
           (cons '*bc-current* *bc-current*)
           (cons '*bc-bookmark-just-added* *bc-bookmark-just-added*)
-          (cons '*bc-bookmarks* *bc-bookmarks*))
-          ))
-    (bc-bookmarks-save-file data-alist bc-bookmark-file))
-  )
+          (cons '*bc-bookmarks* *bc-bookmarks*))))
+    (bc-bookmarks-save-file data-alist bc-bookmark-file)))
 
 (defun bc-bookmarks-restore ()
   "Load the bookmarks from file."
@@ -741,9 +657,7 @@ The following commands are available.
     (when (equal bc--file-magic (cdr (assoc 'magic-number data-alist)))
       (setq *bc-current* (cdr (assoc '*bc-current* data-alist)))
       (setq *bc-bookmark-just-added* (cdr (assoc '*bc-bookmark-just-added* data-alist)))
-      (setq *bc-bookmarks* (cdr (assoc '*bc-bookmarks* data-alist)))
-      ))
-  )
+      (setq *bc-bookmarks* (cdr (assoc '*bc-bookmarks* data-alist))))))
 
 (defun bc-bookmarks-load-file (file)
   "Load the data-list from file."
@@ -755,8 +669,7 @@ The following commands are available.
                             (goto-char (point-min))
                             (read (current-buffer))))
       (kill-buffer loading-buffer)
-      bookmark-list))
-  )
+      bookmark-list)))
 
 (defun bc-bookmarks-save-file (data-alist file)
   "Save the data-alist to file."
@@ -769,8 +682,7 @@ The following commands are available.
         (prin1 data-alist (current-buffer))
         (insert "\n")
         (save-buffer))
-      (kill-buffer writing-buffer)))
-  )
+      (kill-buffer writing-buffer))))
 
 ;; Load from file on start up.
 (add-hook' after-init-hook 'bc-bookmarks-restore)
@@ -778,32 +690,24 @@ The following commands are available.
 ;; Save to file on exit.
 (add-hook 'kill-emacs-hook 'bc-bookmarks-save)
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Advice hooks to set breadcrumb bookmark on find-tag, tags-search, etc.
 
 (defadvice find-tag (before bc-tag activate compile)
   "Intercept find-tag to save a breadcrumb bookmark before jumping to tag."
   (if bc-bookmark-hook-enabled
-      (bc-set))
-  )
+      (bc-set)))
 
 (defadvice tags-search (before bc-tag activate compile)
   "Intercept tags-search to save a breadcrumb bookmark before jumping to tag."
   (if bc-bookmark-hook-enabled
-      (bc-set))
-  )
+      (bc-set)))
 
 (defadvice query-replace (before bc-tag activate compile)
   "Intercept query-replace to save a breadcrumb bookmark before doing the replacement."
   (if bc-bookmark-hook-enabled
-      (bc-set))
-  )
+      (bc-set)))
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 3rd party util functions
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (unless (fboundp 'line-number-at-pos)
   (defun line-number-at-pos (&optional pos)
