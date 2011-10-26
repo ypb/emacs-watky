@@ -526,8 +526,10 @@ It's the position (point) for normal buffer and (info-node-name point) for Info 
       (tm-menu-generic-close-buffer)
       (bc-jump-to bookmark-index))))
 
-(defun bc-menu-advance-cursor ()
-  (forward-line 1)
+(defun bc-menu-advance-cursor (&optional numlines)
+  (if numlines
+      (forward-line numlines)
+    (forward-line 1))
   (when (null (bc-menu-valid-bookmark))
     (goto-char (point-min))
     (forward-line bc--menu-table-offset)))
@@ -536,11 +538,14 @@ It's the position (point) for normal buffer and (info-node-name point) for Info 
   "Visit the bookmark under cursor in the other window."
   (interactive)
   (when (bc-menu-valid-bookmark)
-    ;; Visit the bookmark's buffer in the other window
-    (bc-jump-to (bc-menu-get-bookmark-index) 'switch-to-buffer-other-window)
-    ;; Switch back to the Breadcrumb Bookmark Menu's buffer
-    (switch-to-buffer-other-window (get-buffer bc--menu-buffer))
-    (bc-menu-advance-cursor)))
+    (let ((chosen-bkm-index (bc-menu-get-bookmark-index)))
+      ;; Visit the bookmark's buffer in the other window
+      (bc-jump-to chosen-bkm-index 'switch-to-buffer-other-window)
+      ;; Switch back to the Breadcrumb Bookmark Menu's buffer
+      (switch-to-buffer-other-window (get-buffer bc--menu-buffer))
+      (bc-menu-redraw)
+      (bc-menu-advance-cursor (+ chosen-bkm-index
+                                 bc--menu-table-offset)))))
 
 (defun bc-menu-mark-char (mark-char)
   "Set a mark char on the bookmark line at cursor."
