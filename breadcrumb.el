@@ -729,10 +729,16 @@ If POS is nil, use current buffer location."
 (defun tm-menu-generic-close-buffer ()
   "Make closing buffer work for both Emacs and XEmacs"
   (interactive)
+  ;; delete-window... kill-buffer?
   (if (fboundp 'quit-window)
       (quit-window)
     (bury-buffer)))
 
 (provide 'breadcrumb)
+
+;;; Local Variables:
+;;; mode: Emacs-Lisp
+;;; indent-tabs-mode: nil
+;;; End:
 
 ;;; breadcrumb.el ends here
