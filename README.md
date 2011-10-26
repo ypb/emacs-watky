@@ -26,19 +26,19 @@ covered paths of exploration with:
     with possible "forks" along the way, showing in the:
     * "Nth" look (infinitely away, turned back towards roots) of current "HEADS"...
 
-Codey diagrama: <!-- and .markdown sucks, too -->
-
+Codey diagram, because markdown is brain-dead:
+```text
     ?<-0->1->2->N
        0 ALL roots
           1 given branch (current implementation of one persistent branch)
              2 possibley forksing
                 N ALL HEADS (of currents)
     ? archived breadcrumbs?
-
+```
 I'm probably not making myself clear and nobody is reading this, anyway.
 
 # WHO?
 
-see [TODO](TODO.md) for details...
+see [TODO](ypb/emacs-watky/TODO.md) for details...
 
 # YO!
