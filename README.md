@@ -26,6 +26,7 @@ covered paths of exploration with:
     with possible "forks" along the way, showing in the:
     * "Nth" look (infinitely away, turned back towards roots) of current "HEADS"...
 
+
     ?<-0->1->2->N
        0 ALL roots
           1 given branch (current implementation of one persistent branch)
@@ -33,10 +34,11 @@ covered paths of exploration with:
                 N ALL HEADS (of currents)
     ? archived breadcrumbs?
 
+
 I'm probably not making myself clear and nobody is reading this, anyway.
 
 # WHO?
 
-see [TODO](TODO.md) for details...
+see [TODO](./TODO.md) for details...
 
 # YO!
