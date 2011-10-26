@@ -27,7 +27,7 @@ covered paths of exploration with:
     * "Nth" look (infinitely away, turned back towards roots) of current "HEADS"...
 
 Codey diagram, because markdown is brain-dead:
-```text
+```pre
     ?<-0->1->2->N
        0 ALL roots
           1 given branch (current implementation of one persistent branch)
@@ -39,6 +39,6 @@ I'm probably not making myself clear and nobody is reading this, anyway.
 
 # WHO?
 
-see [TODO](ypb/emacs-watky/TODO.md) for details...
+see [TODO](emacs-watky/TODO.md) for details...
 
 # YO!
