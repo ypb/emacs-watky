@@ -175,6 +175,8 @@
 
 ;;; User Configuration Variables
 
+(require 'bookmark)
+
 (defgroup breadcrumb nil
   "Setting breadcrumb bookmarks and jumping to them."
   :link '(emacs-library-link :tag "Source Lisp File" "breadcrumb.el")
@@ -220,26 +222,25 @@
 Let's try to use emacsen bookmarks system already in place. Might learn
 something along the way and save ourselves reinventing wheel squarely."
   (interactive)
+  (let ((bookmark (tm-make-record)))
+    (tm-bookmark-store bookmark)
+    (message "%s" (mapcar 'bookmark-name-from-full-record *tm-bookmarks*))))
+
+(defun tm-bookmark-store (bookmark)
+  (push bookmark *tm-bookmarks*))
+
+(defun tm-make-record ()
+  "Get a bookmark using bookmark.el machinery as much as possible."
   (let ((bookmark (bookmark-make-record))
-        (timestamp (tm-utc-time-stamp-str))
-        (no-overwrite nil)
-        (bookmark-alist *tm-bookmarks*)
-        ;(bookmark-alist-save bookmark-alist)
-        )
-    ;; (message bookmark)
+        (timestamp (tm-current-time-utc)))
     (if (null (car bookmark))
         ;; this should not happen, but it gives us idea to store OUR
-        ;; meta-info in the nil'ed alist record... naaah
-        (push timestamp bookmark)
-      (progn (message "%s" (mapcar 'bookmark-name-from-full-record bookmark-alist))
-             ;(setq bookmark-alist *tm-bookmarks*)
-             (bookmark-store (car bookmark)
-                             (cdr bookmark)
-                             no-overwrite)
-             ;(push bookmark bookmark-alist)
-             (setq *tm-bookmarks* bookmark-alist)
-             ;(setq bookmark-alist bookmark-alist-save)
-             ))))
+        ;; meta-info in the nil'ed alist record... naaah...
+        (push (format-time-string "%s" timestamp) bookmark))
+    (bookmark-prop-set bookmark
+                       'tm-timestamp
+                       timestamp)
+    bookmark))
 
 (defun bc-previous ()
   "Jump to the previous bookmark."
@@ -287,7 +288,7 @@ something along the way and save ourselves reinventing wheel squarely."
   (setq *bc-current* 0))
 
 (defun tm-clear ()
-  "nullify"
+  "Nullify `*tm-bookmarks*'."
   (interactive)
   (setq *tm-bookmarks* ()))
 
@@ -301,9 +302,9 @@ something along the way and save ourselves reinventing wheel squarely."
   (bc-menu-mode))
 
 (defun tm-list ()
-  "For now selfval `*tm-bookmarks'."
+  "For now ugly hack of a `*tm-bookmarks' pp."
   (interactive)
-  (message "%s" *tm-bookmarks*))
+  (mapcar 'pp *tm-bookmarks*))
 
 ;; Private section
 
@@ -314,7 +315,9 @@ something along the way and save ourselves reinventing wheel squarely."
 The list is (Bookmark1 Bookmark2 ...) where each Bookmark is (TYPE FILENAME . POSITION)")
 (defvar *tm-bookmarks* ()
   "AList of traditional emacsen bookmarks.
-It looks like (let ((ing it)) during standard ops may work) after all.")
+Though except for getting initial bookmark, preserving compatible to them
+format and perhaps reusing jumping mechanism not much else will be of re-use
+to us.")
 
 (defvar *bc-current* 0
   "The current bookmark.  `bc-next' and `bc-previous' would use this as the starting point.")
@@ -752,17 +755,18 @@ The following commands are available.
   (if bc-bookmark-hook-enabled
       (bc-set)))
 
-;;; THREADMACHINY
+;;; THREADMACHINY specific utility functions
 
-(defun tm-utc-time-stamp-str ()
-  ;; use float... meh...
-  (let ((now (current-time))
-        (off-utc (car (current-time-zone))))
-    (format "%d"
-            (+ (* (car now)
-                  (expt 2.0 16))
-               (cadr now)
-               (- off-utc)))))
+(defun tm-current-time-utc (&optional tz-offset)
+  "This function returns standard Emacs (current-time) BUT at UTC.
+If TZ-OFFSET is set use TZ-OFFSET seconds as timezone difference from UTC in
+stead of the (current-time-zone) setting. Positive (east) or negative (west)
+muliples of 3600 make only sense here."
+  (let ((offset (if tz-offset
+                    tz-offset
+                  (car (current-time-zone)))))
+    (time-subtract (current-time)
+                   (seconds-to-time offset))))
 
 ;; 3rd party util functions
 
