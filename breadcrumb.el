@@ -214,6 +214,33 @@
           (setq *bc-bookmark-just-added* t)
           (message "breadcrumb bookmark is set for the current position."))))))
 
+;;; (require 'bookmark)
+(defun tm-set ()
+  "Set a bookmark at the current buffer and current position.
+Let's try to use emacsen bookmarks system already in place. Might learn
+something along the way and save ourselves reinventing wheel squarely."
+  (interactive)
+  (let ((bookmark (bookmark-make-record))
+        (timestamp (tm-utc-time-stamp-str))
+        (no-overwrite nil)
+        (bookmark-alist *tm-bookmarks*)
+        ;(bookmark-alist-save bookmark-alist)
+        )
+    ;; (message bookmark)
+    (if (null (car bookmark))
+        ;; this should not happen, but it gives us idea to store OUR
+        ;; meta-info in the nil'ed alist record... naaah
+        (push timestamp bookmark)
+      (progn (message "%s" (mapcar 'bookmark-name-from-full-record bookmark-alist))
+             ;(setq bookmark-alist *tm-bookmarks*)
+             (bookmark-store (car bookmark)
+                             (cdr bookmark)
+                             no-overwrite)
+             ;(push bookmark bookmark-alist)
+             (setq *tm-bookmarks* bookmark-alist)
+             ;(setq bookmark-alist bookmark-alist-save)
+             ))))
+
 (defun bc-previous ()
   "Jump to the previous bookmark."
   (interactive)
@@ -259,6 +286,11 @@
   (setq *bc-bookmarks* ())
   (setq *bc-current* 0))
 
+(defun tm-clear ()
+  "nullify"
+  (interactive)
+  (setq *tm-bookmarks* ()))
+
 (defun bc-list ()
   "Display the breadcrumb bookmarks in the buffer `*breadcrumbs*' to allow interactive management of them."
   (interactive)
@@ -268,6 +300,11 @@
   (forward-line bc--menu-table-offset)
   (bc-menu-mode))
 
+(defun tm-list ()
+  "For now selfval `*tm-bookmarks'."
+  (interactive)
+  (message "%s" *tm-bookmarks*))
+
 ;; Private section
 
 ;;; Program global variables:
@@ -275,6 +312,9 @@
 (defvar *bc-bookmarks* ()
   "List of bookmarks and their records.
 The list is (Bookmark1 Bookmark2 ...) where each Bookmark is (TYPE FILENAME . POSITION)")
+(defvar *tm-bookmarks* ()
+  "AList of traditional emacsen bookmarks.
+It looks like (let ((ing it)) during standard ops may work) after all.")
 
 (defvar *bc-current* 0
   "The current bookmark.  `bc-next' and `bc-previous' would use this as the starting point.")
@@ -711,6 +751,18 @@ The following commands are available.
   "Intercept query-replace to save a breadcrumb bookmark before doing the replacement."
   (if bc-bookmark-hook-enabled
       (bc-set)))
+
+;;; THREADMACHINY
+
+(defun tm-utc-time-stamp-str ()
+  ;; use float... meh...
+  (let ((now (current-time))
+        (off-utc (car (current-time-zone))))
+    (format "%d"
+            (+ (* (car now)
+                  (expt 2.0 16))
+               (cadr now)
+               (- off-utc)))))
 
 ;; 3rd party util functions
 
