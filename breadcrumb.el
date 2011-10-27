@@ -224,23 +224,35 @@ something along the way and save ourselves reinventing wheel squarely."
   (interactive)
   (let ((bookmark (tm-make-record)))
     (tm-bookmark-store bookmark)
-    (message "%s" (mapcar 'bookmark-name-from-full-record *tm-bookmarks*))))
+    (tm-list)))
 
 (defun tm-bookmark-store (bookmark)
   (push bookmark *tm-bookmarks*))
 
 (defun tm-make-record ()
   "Get a bookmark using bookmark.el machinery as much as possible."
-  (let ((bookmark (bookmark-make-record))
-        (timestamp (tm-current-time-utc)))
-    (if (null (car bookmark))
-        ;; this should not happen, but it gives us idea to store OUR
-        ;; meta-info in the nil'ed alist record... naaah...
-        (push (format-time-string "%s" timestamp) bookmark))
+  (let* ((bookmark (bookmark-make-record))
+         (timestamp (tm-current-time-utc))
+         (el-name (if (null (car bookmark)) "()"
+                    (car bookmark))))
+    (bookmark-prop-set bookmark 'bookmark-el-name el-name)
+    (setcar bookmark (format-time-string "%s" timestamp))
     (bookmark-prop-set bookmark
                        'tm-timestamp
                        timestamp)
     bookmark))
+
+(defun tm-bookmark-terse (tm-bookmark)
+  "Return \"Compressesed\" string representation of the bookmark.
+ATM it's \"tm-name\"-\"el-name\"#\"position\" ..."
+  (let* ((el-name (bookmark-prop-get tm-bookmark 'bookmark-el-name))
+         (name (if (stringp el-name)
+                     el-name
+                   "...")))
+    (format "%s-%s#%s"
+            (bookmark-name-from-full-record tm-bookmark)
+            name
+            (bookmark-prop-get tm-bookmark 'position))))
 
 (defun bc-previous ()
   "Jump to the previous bookmark."
@@ -301,10 +313,12 @@ something along the way and save ourselves reinventing wheel squarely."
   (forward-line bc--menu-table-offset)
   (bc-menu-mode))
 
-(defun tm-list ()
+(defun tm-list (&optional full)
   "For now ugly hack of a `*tm-bookmarks' pp."
   (interactive)
-  (mapcar 'pp *tm-bookmarks*))
+  (if full
+      (mapcar 'pp *tm-bookmarks*)
+    (message "%s" (mapcar 'tm-bookmark-terse *tm-bookmarks*))))
 
 ;; Private section
 
@@ -792,9 +806,9 @@ If POS is nil, use current buffer location."
 
 (provide 'breadcrumb)
 
-;;; Local Variables:
-;;; mode: Emacs-Lisp
-;;; indent-tabs-mode: nil
-;;; End:
+;; Local Variables:
+;; mode: Emacs-Lisp
+;; indent-tabs-mode: nil
+;; End:
 
 ;;; breadcrumb.el ends here
