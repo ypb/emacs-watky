@@ -196,6 +196,13 @@
   :type 'boolean
   :group 'breadcrumb)
 
+(defcustom bc-bookmark-autosave-time 900
+  "Number of seconds between timer triggered autosaves.
+Set to 0 in order to disable in the future. Running timer can be disabled
+by envoking (`cancel-timer' `*bc-bookmarks-save-timer*')."
+  :type 'integer
+  :group 'breadcrumb)
+
 ;;; User callable functions
 
 (defun bc-set ()
@@ -690,7 +697,16 @@ The following commands are available.
       (kill-buffer writing-buffer))))
 
 ;; Load from file on start up.
-(add-hook' after-init-hook 'bc-bookmarks-restore)
+(add-hook 'after-init-hook 'bc-bookmarks-restore)
+
+;; Create autosave timer.
+(add-hook 'after-init-hook
+          (lambda ()
+            (if (< 0 bc-bookmark-autosave-time)
+                (setq *bc-bookmarks-save-timer*
+                      (run-with-timer 300
+                                      bc-bookmark-autosave-time
+                                      'bc-bookmarks-save)))))
 
 ;; Save to file on exit.
 (add-hook 'kill-emacs-hook 'bc-bookmarks-save)
