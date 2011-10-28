@@ -52,37 +52,55 @@
 Let's try to use emacsen bookmarks system already in place. Might learn
 something along the way and save ourselves reinventing wheel squarely."
   (interactive)
-  (let ((bookmark (tm-make-record)))
-    (tm-bookmark-store bookmark)
+  (let ((bookmark (tm-record-make)))
+    (tm-record-store bookmark)
     (tm-list)))
 
 (defun tm-clear ()
-  "Nullify `*tm-bookmarks*'."
+  "Clear `volatile' state.
+Even though we plan on saving to disk on every little bittly, fiddly change
+of `volatile' state[tm]."
   (interactive)
-  (setq *tm-bookmarks* ()))
+  (setq *tm-records-branch* ())
+  (setq *tm-records-root* ()))
 
 (defun tm-list (&optional full)
-  "For now ugly hack of a `*tm-bookmarks' pp."
+  "We really need to implement saving and restoring.
+As on t FULL we are doing pretty-printing of the records to *Message* buffer."
   (interactive)
   (if full
-      (mapcar 'pp *tm-bookmarks*)
-    (message "%s" (mapcar 'tm-bookmark-terse *tm-bookmarks*))))
+      (mapcar 'pp *tm-records-branch*)
+    (message "%s" (mapcar 'tm-bookmark-terse *tm-records-branch*))))
 
 ;; Private section
 
-(defvar *tm-bookmarks* ()
-  "AList of traditional emacsen bookmarks.
+(defvar *tm-records-root* ()
+  "AList of `root' bookmarks.")
+
+(defvar *tm-records-branch* ()
+  "AList of semi-traditional emacsen bookmarks.
 Though except for getting initial bookmark, preserving compatible to them
 format and perhaps reusing jumping mechanism not much else will be of re-use
 to us.")
 
 ;; Bookmark record functions
 
-(defun tm-bookmark-store (bookmark)
-  (push bookmark *tm-bookmarks*))
+(defun tm-record-make ()
+  "Create a bookmark using `bookmark.el' machinery.
+In short it has (\"NAME\" ALIST) format where ALIST contains properties:
 
-(defun tm-make-record ()
-  "Get a bookmark using bookmark.el machinery as much as possible."
+'filename
+'position
+'front-context-string
+'rear-context-string
+'whatever
+'handler
+'annotations see `bookmark-make-record'. We add ours with `tm-' prefix except:
+'bookmark-el-name (because we set our own hopefully unique, though ugly, NAME)
+'tm-timestamp
+
+One can operate on this bookmark record with `bookmark-prop-get' and
+`bookmark-prop-set'."
   (let* ((bookmark (bookmark-make-record))
          (timestamp (tm-current-time-utc))
          (el-name (if (null (car bookmark)) "()"
@@ -106,6 +124,16 @@ ATM it's \"tm-name\"-\"el-name\"#\"position\" ..."
             name
             (bookmark-prop-get tm-bookmark 'position))))
 
+(defun tm-record-store (bookmark &optional to)
+  "Push BOOKMARK record TO (default: 'branch, or 'root).
+Perhaps doing other record keeping chores. Perhaps this is polymorphic
+overshit... meh."
+  (let ((where (if (null to) 'branch
+                 to)))
+    (case where
+      ('root (push bookmark *tm-records-root*))
+      (t (push bookmark *tm-records-branch*)))))
+
 ;; Bookmark current state functions
 
 ;; Bookmark saving and restoring
@@ -113,10 +141,10 @@ ATM it's \"tm-name\"-\"el-name\"#\"position\" ..."
 ;; general utility functions
 
 (defun tm-current-time-utc (&optional tz-offset)
-  "This function returns standard Emacs (current-time) BUT at UTC.
+  "This function returns standard Emacs `current-time' BUT at UTC.
 If TZ-OFFSET is set use TZ-OFFSET seconds as timezone difference from UTC in
-stead of the (current-time-zone) setting. Positive (east) or negative (west)
-muliples of 3600 make only sense here."
+stead of the `current-time-zone' setting. Positive (east) or negative (west)
+multiples of 3600 make only sense here."
   (let ((offset (if tz-offset
                     tz-offset
                   (car (current-time-zone)))))
